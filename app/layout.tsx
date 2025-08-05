@@ -4,9 +4,12 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Math Game - Belajar & Bermain',
+  description: 'Yuk, belajar matematika sambil bermain!',
   generator: 'v0.dev',
+  icons: {
+    icon: '/math-game-icon.png',
+  },
 }
 
 export default function RootLayout({

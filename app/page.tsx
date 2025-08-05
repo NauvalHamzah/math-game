@@ -1,14 +1,19 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Play, Star, Clock, Users, Trophy, BookOpen } from "lucide-react"
-import MathGame from "../games/target-number"
+import { Play, Star, Clock, Users, Trophy, BookOpen, GraduationCap, RefreshCw } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import CategoryFilter from "@/components/number-match/category-filter"
+import GradeFilter from "@/components/number-match/grade-filter"
 
-type GameDifficulty = "Easy" | "Medium" | "Hard"
-type GameCategory = "Numbers" | "Geometry" | "Logic" | "Algebra"
+
+
+type GameDifficulty = "Mudah" | "Sedang" | "Sulit"
+type GameCategory = "Bilangan" | "Geometri" | "Logika" | "Aljabar"
+type GameGrade = "Kelas 1" | "Kelas 2" | "Kelas 3" | "Kelas 4" | "Kelas 5" | "Kelas 6"
 
 type Game = {
   id: string
@@ -16,6 +21,7 @@ type Game = {
   description: string
   category: GameCategory
   difficulty: GameDifficulty
+  grade: GameGrade
   duration: string
   players: string
   rating: number
@@ -25,18 +31,22 @@ type Game = {
 }
 
 export default function HomePage() {
-  const [selectedGame, setSelectedGame] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState(["Semua"])
+  const [selectedGrade, setSelectedGrade] = useState(["Semua"])
+
+  const router = useRouter()
 
   const games: Game[] = [
     {
-      id: "target-match",
-      title: "Target Match Challenge",
+      id: "number-match",
+      title: "Tantangan Cocok Target",
       description:
-        "Select cards with decimals, fractions, and percentages to reach the target number using different operations.",
-      category: "Numbers",
-      difficulty: "Medium",
-      duration: "5-10 min",
-      players: "1 player",
+        "Pilih kartu berisi desimal, pecahan, dan persen untuk mencapai angka target dengan berbagai operasi.",
+      category: "Bilangan",
+      difficulty: "Sedang",
+      grade: "Kelas 5",
+      duration: "5–10 menit",
+      players: "1 pemain",
       rating: 4.8,
       isAvailable: true,
       icon: "🎯",
@@ -44,12 +54,14 @@ export default function HomePage() {
     },
     {
       id: "fraction-builder",
-      title: "Fraction Builder",
-      description: "Build and compare fractions using visual pie charts and number lines.",
-      category: "Numbers",
-      difficulty: "Easy",
-      duration: "3-7 min",
-      players: "1 player",
+      title: "Pembangun Pecahan",
+      description:
+        "Bangun dan bandingkan pecahan menggunakan diagram lingkaran dan garis bilangan.",
+      category: "Bilangan",
+      difficulty: "Mudah",
+      grade: "Kelas 4",
+      duration: "3–7 menit",
+      players: "1 pemain",
       rating: 4.6,
       isAvailable: false,
       icon: "🥧",
@@ -57,25 +69,29 @@ export default function HomePage() {
     },
     {
       id: "shape-explorer",
-      title: "Shape Explorer",
-      description: "Identify and classify 2D and 3D shapes while learning their properties.",
-      category: "Geometry",
-      difficulty: "Easy",
-      duration: "4-8 min",
-      players: "1 player",
+      title: "Penjelajah Bangun",
+      description:
+        "Identifikasi dan klasifikasikan bangun 2D dan 3D sambil mempelajari sifat-sifatnya.",
+      category: "Geometri",
+      difficulty: "Mudah",
+      grade: "Kelas 3",
+      duration: "4–8 menit",
+      players: "1 pemain",
       rating: 4.7,
       isAvailable: false,
       icon: "🔺",
-      color: "from-orange-400 to-red-500",
+      color: "from-blue-400 to-green-500",
     },
     {
       id: "pattern-detective",
-      title: "Pattern Detective",
-      description: "Solve number and shape patterns to unlock the next sequence.",
-      category: "Logic",
-      difficulty: "Hard",
-      duration: "8-15 min",
-      players: "1 player",
+      title: "Detektif Pola",
+      description:
+        "Selesaikan pola angka dan bentuk untuk membuka urutan selanjutnya.",
+      category: "Logika",
+      difficulty: "Sulit",
+      grade: "Kelas 6",
+      duration: "8–15 menit",
+      players: "1 pemain",
       rating: 4.9,
       isAvailable: false,
       icon: "🔍",
@@ -83,12 +99,14 @@ export default function HomePage() {
     },
     {
       id: "equation-balance",
-      title: "Equation Balance",
-      description: "Balance equations by moving numbers and operations to both sides.",
-      category: "Algebra",
-      difficulty: "Hard",
-      duration: "6-12 min",
-      players: "1 player",
+      title: "Keseimbangan Persamaan",
+      description:
+        "Seimbangkan persamaan dengan memindahkan angka dan operasi ke kedua sisi.",
+      category: "Aljabar",
+      difficulty: "Sulit",
+      grade: "Kelas 5",
+      duration: "6–12 menit",
+      players: "1 pemain",
       rating: 4.5,
       isAvailable: false,
       icon: "⚖️",
@@ -96,71 +114,116 @@ export default function HomePage() {
     },
     {
       id: "time-master",
-      title: "Time Master",
-      description: "Practice telling time with analog and digital clocks in fun scenarios.",
-      category: "Numbers",
-      difficulty: "Easy",
-      duration: "3-6 min",
-      players: "1 player",
+      title: "Ahli Waktu",
+      description:
+        "Latih kemampuan membaca jam analog dan digital melalui skenario yang seru.",
+      category: "Bilangan",
+      difficulty: "Mudah",
+      grade: "Kelas 2",
+      duration: "3–6 menit",
+      players: "1 pemain",
       rating: 4.4,
       isAvailable: false,
       icon: "⏰",
       color: "from-yellow-400 to-orange-500",
     },
-  ]
+    {
+      id: "money-game",
+      title: "Matematika Uang",
+      description:
+        "Hitung koin, kembalian, dan selesaikan masalah uang dalam kehidupan nyata.",
+      category: "Bilangan",
+      difficulty: "Sedang",
+      grade: "Kelas 3",
+      duration: "4–9 menit",
+      players: "1 pemain",
+      rating: 4.3,
+      isAvailable: true,
+      icon: "💰",
+      color: "from-emerald-400 to-teal-500",
+    },
+    {
+      id: "multiplication-race",
+      title: "Balapan Perkalian",
+      description:
+        "Melaju cepat melewati tabel perkalian dengan tantangan balapan yang seru.",
+      category: "Bilangan",
+      difficulty: "Sedang",
+      grade: "Kelas 1",
+      duration: "3–8 menit",
+      players: "1 pemain",
+      rating: 4.7,
+      isAvailable: false,
+      icon: "🏎️",
+      color: "from-red-400 to-orange-500",
+    },
+    {
+      id: "word-problems",
+      title: "Pemecah Soal Cerita",
+      description:
+        "Pahami dan selesaikan soal cerita matematika langkah demi langkah.",
+      category: "Logika",
+      difficulty: "Sulit",
+      grade: "Kelas 4",
+      duration: "6–12 menit",
+      players: "1 pemain",
+      rating: 4.6,
+      isAvailable: false,
+      icon: "📝",
+      color: "from-indigo-400 to-purple-500",
+    },
+  ];
 
-  const categories = ["All", "Numbers", "Geometry", "Logic", "Algebra"]
-  const [selectedCategory, setSelectedCategory] = useState("All")
+  const filteredGames = games.filter((game) => {
+    const categoryMatch =
+      selectedCategory.includes("Semua") ||
+      selectedCategory.includes(game.category)
 
-  const filteredGames = games.filter((game) => selectedCategory === "All" || game.category === selectedCategory)
+    const gradeMatch =
+      selectedGrade.includes("Semua") ||
+      selectedGrade.includes(game.grade)
+
+    return categoryMatch && gradeMatch
+  })
+
 
   const getDifficultyColor = (difficulty: GameDifficulty) => {
     switch (difficulty) {
-      case "Easy":
+      case "Mudah":
         return "bg-green-100 text-green-800"
-      case "Medium":
+      case "Sedang":
         return "bg-yellow-100 text-yellow-800"
-      case "Hard":
+      case "Sulit":
         return "bg-red-100 text-red-800"
     }
   }
 
-  const handlePlayGame = (gameId: string) => {
-    if (gameId === "target-match") {
-      setSelectedGame(gameId)
+  const getGradeColor = (grade: GameGrade) => {
+    if (grade === "Kelas 1" || grade === "Kelas 2") {
+      return "bg-blue-100 text-blue-800"
+    } else if (grade === "Kelas 3" || grade === "Kelas 4") {
+      return "bg-purple-100 text-purple-800"
     } else {
-      // For other games, show coming soon message
-      alert("🚧 Coming Soon! This game is under development.")
+      return "bg-orange-100 text-orange-800"
     }
   }
 
-  const handleBackToHome = () => {
-    setSelectedGame(null)
+  const handlePlayGame = (gameId: string) => {
+    switch (gameId) {
+      case "number-match":
+        router.push(`/games/${gameId}`);
+        break;
+
+      case "money-game":
+        router.push(`/games/${gameId}`);
+        break;
+
+      default:
+        alert("🚧 Coming Soon! This game is under development.");
+        break;
+    }
   }
 
-  // If a game is selected, show that game
-  if (selectedGame === "target-match") {
-    return (
-      <div>
-        <div className="bg-white shadow-sm border-b p-4">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <Button
-              onClick={handleBackToHome}
-              variant="outline"
-              className="border-2 border-purple-400 text-purple-600 hover:bg-purple-50 bg-transparent"
-            >
-              ← Back to Games
-            </Button>
-            <h1 className="text-xl font-bold text-gray-800">Target Match Challenge</h1>
-            <div></div>
-          </div>
-        </div>
-        <MathGame />
-      </div>
-    )
-  }
-
-  // Main landing page
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
       {/* Header */}
@@ -168,19 +231,19 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto p-6">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-purple-800 mb-2">🎓 MathPlay Academy</h1>
-            <p className="text-xl text-gray-600 mb-4">Fun and Interactive Math Games for Elementary Students</p>
+            <p className="text-xl text-gray-600 mb-4">Permainan Matematika Interaktif dan Seru untuk Siswa SD</p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>Ages 6-12</span>
-              </div>
-              <div className="flex items-center gap-1">
                 <BookOpen className="w-4 h-4" />
-                <span>Curriculum Aligned</span>
+                <span>Sesuai Kurikulum</span>
               </div>
               <div className="flex items-center gap-1">
                 <Trophy className="w-4 h-4" />
-                <span>Progress Tracking</span>
+                <span>Pemantauan Progress</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <GraduationCap className="w-4 h-4" />
+                <span>Kelas 1–6</span>
               </div>
             </div>
           </div>
@@ -188,24 +251,40 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-6xl mx-auto p-6">
-        {/* Category Filter */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Choose Your Adventure</h2>
-          <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
+        {/* Filters */}
+        <div className="mb-8 px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 text-center">
+            Pilih Petualanganmu
+          </h2>
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full items-center">
+            {/* Filters container - takes available space */}
+            <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full min-w-0 mr-4">
+              {/* Category - expanded width */}
+              <div className="flex-1 min-w-[200px] sm:min-w-[280px]">
+                <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
+              </div>
+
+              {/* Grade - expanded width */}
+              <div className="flex-1 min-w-[200px] sm:min-w-[280px]">
+                <GradeFilter selected={selectedGrade} onChange={setSelectedGrade} />
+              </div>
+            </div>
+
+            {/* Reset Button - pushed to far right */}
+            <div className="w-full sm:w-auto mt-2 sm:mt-0 ml-10">
               <Button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                variant={selectedCategory === category ? "default" : "outline"}
-                className={`rounded-full px-6 py-2 ${
-                  selectedCategory === category
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "border-2 border-purple-300 text-purple-600 hover:bg-purple-50"
-                }`}
+                variant="outline"
+                className="w-full sm:w-auto border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 flex items-center justify-center gap-2 py-2 px-4"
+                onClick={() => {
+                  setSelectedCategory(["Semua"])
+                  setSelectedGrade(["Semua"])
+                }}
               >
-                {category}
+                <RefreshCw className="w-4 h-4" />
+                <span>Reset Filter</span>
               </Button>
-            ))}
+            </div>
           </div>
         </div>
 
@@ -214,34 +293,36 @@ export default function HomePage() {
           {filteredGames.map((game) => (
             <Card
               key={game.id}
-              className={`overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-                !game.isAvailable ? "opacity-75" : ""
-              }`}
+              className={`overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col h-full ${!game.isAvailable ? "opacity-75" : ""
+                }`}
             >
               <div className={`h-32 bg-gradient-to-r ${game.color} flex items-center justify-center`}>
                 <span className="text-6xl">{game.icon}</span>
               </div>
 
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 flex-shrink-0">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-lg font-bold text-gray-800 leading-tight">{game.title}</CardTitle>
                   {!game.isAvailable && (
                     <Badge variant="secondary" className="text-xs">
-                      Soon
+                      Segera
                     </Badge>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
                   <Badge className={getDifficultyColor(game.difficulty)}>{game.difficulty}</Badge>
                   <Badge variant="outline" className="text-xs">
                     {game.category}
                   </Badge>
+                  <Badge className={getGradeColor(game.grade as GameGrade)}>
+                    {game.grade}
+                  </Badge>
                 </div>
               </CardHeader>
 
-              <CardContent className="pt-0">
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{game.description}</p>
+              <CardContent className="pt-0 flex flex-col flex-grow">
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">{game.description}</p>
 
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                   <div className="flex items-center gap-1">
@@ -261,65 +342,79 @@ export default function HomePage() {
                 <Button
                   onClick={() => handlePlayGame(game.id)}
                   disabled={!game.isAvailable}
-                  className={`w-full ${
-                    game.isAvailable
-                      ? "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
+                  className={`w-full mt-auto ${game.isAvailable
+                    ? "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  {game.isAvailable ? "Play Now" : "Coming Soon"}
+                  {game.isAvailable ? "Main" : "Segera Hadir"}
                 </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {/* No Results Message */}
+        {filteredGames.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-bold text-gray-600 mb-2">Tidak ada permainan ditemukan</h3>
+            <p className="text-gray-500">Coba ubah filter untuk melihat lebih banyak permainan.</p>
+          </div>
+        )}
+
+
         {/* Stats Section */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">🌟 Learning Made Fun</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">🌟 Belajar Jadi Menyenangkan</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">6</div>
-              <div className="text-gray-600">Interactive Games</div>
-              <div className="text-sm text-gray-500 mt-1">More coming soon!</div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">{games.length}</div>
+              <div className="text-gray-600">Permainan Interaktif</div>
+              <div className="text-sm text-gray-500 mt-1">Segera hadir lebih banyaj!!</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-600 mb-2">4</div>
-              <div className="text-gray-600">Math Categories</div>
-              <div className="text-sm text-gray-500 mt-1">Numbers, Geometry, Logic, Algebra</div>
+              <div className="text-gray-600">Kategori </div>
+              <div className="text-sm text-gray-500 mt-1">Bilangan, Geometri, Logika, Aljabar</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">3</div>
-              <div className="text-gray-600">Difficulty Levels</div>
-              <div className="text-sm text-gray-500 mt-1">Easy, Medium, Hard</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">6</div>
+              <div className="text-gray-600">Tingkat Kelas</div>
+              <div className="text-sm text-gray-500 mt-1">Kelas 1 sampai 6</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-orange-600 mb-2">3</div>
+              <div className="text-gray-600">Tingkat Kesulitan</div>
+              <div className="text-sm text-gray-500 mt-1">Mudah, Sedang, Sulit</div>
             </div>
           </div>
         </div>
 
         {/* Features Section */}
         <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-8">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">✨ Why Choose MathPlay Academy?</h3>
+          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">✨ Mengapa Memilih MathPlay Academy?</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-3xl mb-3">🎮</div>
-              <h4 className="font-bold text-gray-800 mb-2">Gamified Learning</h4>
-              <p className="text-sm text-gray-600">Turn math practice into exciting adventures</p>
+              <h4 className="font-bold text-gray-800 mb-2">Pembelajaran Berbasis Permainan</h4>
+              <p className="text-sm text-gray-600">Ubah latihan matematika menjadi petualangan seru</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">📊</div>
-              <h4 className="font-bold text-gray-800 mb-2">Progress Tracking</h4>
-              <p className="text-sm text-gray-600">Monitor improvement with detailed analytics</p>
+              <h4 className="font-bold text-gray-800 mb-2">Pemantauan Kemajuan</h4>
+              <p className="text-sm text-gray-600">Pantau perkembangan melalui analitik yang mendetail</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">🎯</div>
-              <h4 className="font-bold text-gray-800 mb-2">Adaptive Difficulty</h4>
-              <p className="text-sm text-gray-600">Games adjust to your skill level</p>
+              <h4 className="font-bold text-gray-800 mb-2">Kesulitan Adaptif</h4>
+              <p className="text-sm text-gray-600">Permainan menyesuaikan dengan tingkat kemampuanmu</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">🏆</div>
-              <h4 className="font-bold text-gray-800 mb-2">Achievements</h4>
-              <p className="text-sm text-gray-600">Earn badges and celebrate success</p>
+              <h4 className="font-bold text-gray-800 mb-2">Sesuai Kurikulum</h4>
+              <p className="text-sm text-gray-600">Konten selaras dengan standar pendidikan nasional</p>
             </div>
           </div>
         </div>
@@ -329,12 +424,13 @@ export default function HomePage() {
       <footer className="bg-gray-800 text-white p-8 mt-12">
         <div className="max-w-6xl mx-auto text-center">
           <h4 className="text-xl font-bold mb-2">🎓 MathPlay Academy</h4>
-          <p className="text-gray-300 mb-4">Making math fun, one game at a time!</p>
+          <p className="text-gray-300 mb-4">Membuat matematika jadi menyenangkan, satu permainan dalam satu waktu!</p>
           <div className="text-sm text-gray-400">
-            <p>© 2024 MathPlay Academy. Designed for elementary education.</p>
+            <p>© 2025 MathPlay Academy. Dirancang untuk pendidikan sekolah dasar.</p>
           </div>
         </div>
       </footer>
+
     </div>
   )
 }

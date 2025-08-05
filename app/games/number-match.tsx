@@ -65,7 +65,7 @@ export default function MathGame() {
 
     // Generate target based on operation and difficulty
     let targetValue: number
-    let targetDisplayValue: string
+    let targetDisplayValue: string = "2.5";
     let targetTypeValue: "decimal" | "fraction" | "percentage" = "decimal"
     let targetNum: number | undefined
     let targetDenom: number | undefined
@@ -192,7 +192,7 @@ export default function MathGame() {
     const createCard = (cardId: number, value: number): NumberCard | null => {
       if (usedValues.has(value)) return null
 
-      let card: NumberCard
+      let card: NumberCard | null = null;
 
       if (difficulty === "easy") {
         card = {
@@ -322,7 +322,7 @@ export default function MathGame() {
     // Shuffle the cards
     for (let i = newCards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[newCards[i], newCards[j]] = [newCards[j], newCards[i]]
+        ;[newCards[i], newCards[j]] = [newCards[j], newCards[i]]
     }
 
     setCards(newCards)
@@ -569,26 +569,24 @@ export default function MathGame() {
               return (
                 <Card
                   key={card.id}
-                  className={`cursor-pointer transition-all duration-300 ${
-                    isSelected
+                  className={`cursor-pointer transition-all duration-300 ${isSelected
                       ? "bg-red-100 border-2 border-red-400 scale-95"
                       : isDisabled
                         ? "opacity-40 cursor-not-allowed"
                         : "hover:scale-105 hover:shadow-md bg-white"
-                  }`}
+                    }`}
                   onClick={() => !isDisabled && handleCardClick(card.id)}
                 >
                   <CardContent className="p-4 text-center min-h-[80px] flex items-center justify-center">
                     <div
-                      className={`text-xl md:text-2xl font-bold ${
-                        isSelected
+                      className={`text-xl md:text-2xl font-bold ${isSelected
                           ? "text-red-600"
                           : card.type === "decimal"
                             ? "text-blue-600"
                             : card.type === "fraction"
                               ? "text-purple-600"
                               : "text-orange-600"
-                      }`}
+                        }`}
                     >
                       {card.type === "fraction" ? (
                         <FractionDisplay numerator={card.numerator!} denominator={card.denominator!} />
