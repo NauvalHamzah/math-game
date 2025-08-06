@@ -26,13 +26,13 @@ export function TutorialDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-white p-6 rounded-lg shadow-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gameOrange-700">Cara Bermain Money-Match</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-gameOrange-700">Cara Bermain Money-Game</DialogTitle>
           <DialogDescription className="text-gray-600 mt-2">
             Pelajari cara bermain setiap mode game untuk menguasai Rupiah!
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4 text-gray-700">
-          <h3 className="font-semibold text-lg text-gameGreen-700">Mode Belajar:</h3>
+          <h3 className="font-semibold text-lg text-blue-700">Mode Belajar:</h3>
           <ul className="list-disc pl-5 space-y-1">
             <li>
               <span className="font-medium">Kenali Uang:</span> Cocokkan gambar uang dengan nilainya.

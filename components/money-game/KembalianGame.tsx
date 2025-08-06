@@ -1,5 +1,6 @@
 import { GameLayout } from './GameLayout'
-import { rupiahDenominations } from "@/components/type/MoneyGame"
+import { rupiahDenominations, Screen } from "@/components/type/MoneyGame"
+import { Check, X } from 'lucide-react' // For the checkmark icon
 
 interface KembalianGameProps {
   itemPrice: number
@@ -10,8 +11,12 @@ interface KembalianGameProps {
   totalQuestions: number
   onBack: () => void
   onCoinClick: (value: number) => void
+  onRemoveCoin: (index: number) => void  
   onCheck: () => void
+  getCoinCounts: (value: number[]) => Record<number, number>  
   feedback?: 'correct' | 'wrong' | null
+  showCompletion: boolean
+  currentScreen: Screen
 }
 
 const formatRupiah = (amount: number) => {
@@ -31,8 +36,12 @@ export function KembalianGame({
   totalQuestions,
   onBack,
   onCoinClick,
+  onRemoveCoin,
   onCheck,
-  feedback
+  getCoinCounts,
+  feedback,
+  showCompletion,
+  currentScreen
 }: KembalianGameProps) {
   const currentTotal = selectedChange.reduce((sum, val) => sum + val, 0)
   
@@ -43,76 +52,108 @@ export function KembalianGame({
       totalQuestions={totalQuestions}
       onBack={onBack}
       feedback={feedback}
+      showCompletion={showCompletion}
     >
-      <div className="flex flex-col items-center">
-        {/* Transaction Info */}
-        <div className="bg-white p-6 rounded-2xl shadow-xl mb-8 text-center border-2 border-purple-200 w-full">
-          <div className="grid grid-cols-2 gap-4 text-left mb-4">
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-gray-600 font-medium">Harga Barang:</p>
-              <p className="text-2xl font-bold text-purple-600">
+      <div className="flex flex-col h-full gap-6">
+        {/* Transaction Summary */}
+        <div className="bg-white p-4 rounded-xl shadow-md border-2 border-purple-300">
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+              <p className="text-sm font-medium text-blue-700">Harga Barang</p>
+              <p className="text-xl font-bold text-blue-800">
                 {formatRupiah(itemPrice)}
               </p>
             </div>
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-gray-600 font-medium">Uang Pelanggan:</p>
-              <p className="text-2xl font-bold text-green-600">
+            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+              <p className="text-sm font-medium text-green-700">Dibayar</p>
+              <p className="text-xl font-bold text-green-800">
                 {formatRupiah(customerPayment)}
               </p>
             </div>
           </div>
-          <div className="bg-yellow-100 p-4 rounded-lg border border-yellow-300">
-            <p className="text-lg text-gray-700 font-semibold">Kembalian yang harus diberikan:</p>
-            <p className="text-4xl font-extrabold text-red-600 animate-pulse">
+          <div className="bg-yellow-50 p-3 rounded-lg border-2 border-yellow-300 text-center">
+            <p className="text-sm font-semibold text-yellow-800">Kembalian yang harus diberikan</p>
+            <p className="text-2xl font-extrabold text-yellow-600">
               {formatRupiah(changeNeeded)}
             </p>
           </div>
         </div>
 
-        {/* Coin Selection */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-8 w-full">
+        {/* Selected Change Display */}
+        <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-sm font-semibold text-purple-700">Kembalian Dipilih:</p>
+            <p className={`text-lg font-bold ${
+              currentTotal > changeNeeded ? "text-red-600" : 
+              currentTotal < changeNeeded ? "text-yellow-600" : "text-purple-700"
+            }`}>
+              {formatRupiah(currentTotal)}
+            </p>
+          </div>
+          
+          {selectedChange.length > 0 ? (
+  <div className="flex flex-wrap gap-2">
+    {Object.entries(getCoinCounts(selectedChange)).map(([value, count]) => (
+      <div key={value} className="relative">
+        <button
+          onClick={() => onRemoveCoin(selectedChange.indexOf(Number(value)))}
+          className="relative group transform hover:scale-105 transition-transform focus:outline-none"
+        >
+          <img
+            src={`/${rupiahDenominations.find(d => d.value === Number(value))?.image}`}
+            alt={`Rp${value}`}
+            className="h-12 w-auto object-contain"
+          />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-20">
+            <span className="bg-green-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow pointer-events-none">
+              {count}
+            </span>
+          </div>
+        </button>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-gray-500 text-sm italic py-1">Belum ada uang kembalian dipilih</p>
+)}
+        </div>
+
+        {/* Money Options */}
+        <div className="flex flex-wrap gap-3 justify-center px-1 py-2">
           {rupiahDenominations.map((denom) => (
             <button
               key={denom.value}
               onClick={() => onCoinClick(denom.value)}
               disabled={feedback !== null}
-              className={`relative rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 ${
+              className={`flex flex-col items-center p-2 rounded-lg border-2 ${
                 selectedChange.includes(denom.value)
-                  ? "ring-4 ring-purple-500 scale-105"
-                  : "ring-2 ring-gray-200"
-              }`}
+                  ? "border-purple-500 bg-purple-100"
+                  : "border-gray-200 bg-white hover:border-purple-300"
+              } hover:bg-purple-50 transition-colors shadow-sm min-w-[70px]`}
             >
-              <div
-                className={`${denom.isBill ? "w-[120px] h-[70px]" : "w-[80px] h-[80px]"} ${
-                  denom.color
-                } flex items-center justify-center text-white font-bold text-sm rounded-lg shadow-md`}
-              >
-                {formatRupiah(denom.value).replace("Rp", "")}
-              </div>
+              <img
+                src={`/${denom.image}`}
+                alt={`Rp${denom.value}`}
+                className={`${denom.isBill ? "h-14" : "h-12"} w-auto object-contain`}
+              />
               {selectedChange.includes(denom.value) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-purple-500/30 rounded-lg">
-                  <span className="text-white text-xl font-bold">✓</span>
+                <div className="absolute -top-1 -right-1 bg-purple-500 rounded-full p-1">
+                  <Check className="h-3 w-3 text-white" />
                 </div>
               )}
             </button>
           ))}
         </div>
 
-        {/* Current Change */}
-        <div className="bg-purple-100 p-4 rounded-xl shadow-inner mb-6 w-full text-center border border-purple-300">
-          <p className="text-lg text-purple-800 font-semibold">Kembalian Pilihanmu:</p>
-          <p className={`text-4xl font-bold ${
-            currentTotal > changeNeeded ? "text-red-600" : "text-purple-700"
-          }`}>
-            {formatRupiah(currentTotal)}
-          </p>
-        </div>
-
-        {/* Give Change Button */}
+        {/* Check Button */}
         <button
           onClick={onCheck}
           disabled={feedback !== null || selectedChange.length === 0}
-          className="w-full max-w-xs h-14 text-2xl font-bold rounded-xl shadow-lg bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+          className={`w-full py-3 text-xl font-bold rounded-xl shadow-lg ${
+            selectedChange.length > 0
+              ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+              : "bg-gray-300"
+          } text-white transition-all transform hover:scale-[1.01]`}
         >
           Berikan Kembalian
         </button>

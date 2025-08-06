@@ -1,24 +1,26 @@
 // components/PracticeModeScreen.tsx
-import { ArrowLeft, Coins, Plus, ShoppingCart, RefreshCw, Star } from 'lucide-react'
+import { ArrowLeft, Coins, ShoppingCart, RefreshCw, Replace } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Screen, GameType } from "@/components/type/MoneyGame"
 
 
 interface PracticeModeScreenProps {
+  currentScreen: "practice" | "challenge"
   setCurrentScreen: (screen: Screen) => void
-  startGame: (gameType: GameType) => void
+  startGame: (gameType: GameType, screen: "practice" | "challenge") => void
 }
 
-export default function PracticeModeScreen({ setCurrentScreen, startGame }: PracticeModeScreenProps) {
+export default function PracticeModeScreen({ currentScreen, setCurrentScreen, startGame }: PracticeModeScreenProps) {
   const miniGames = [
-    { 
-      title: "Kenali Uang", 
+    {
+      title: "Kenali Uang",
       description: "Pelajari nilai mata uang Rupiah",
-      icon: <Coins className="h-10 w-10 text-yellow-500" />, 
-      difficulty: 1, 
+      icon: <Coins className="h-10 w-10 text-yellow-500" />,
+      difficulty: 1,
       type: "kenali-uang" as GameType,
-      bgColor: "bg-yellow-50"
+      bgColor: "bg-green-100",
+      active: true
     },
     {
       title: "Beli Barang",
@@ -26,20 +28,31 @@ export default function PracticeModeScreen({ setCurrentScreen, startGame }: Prac
       icon: <ShoppingCart className="h-10 w-10 text-blue-500" />,
       difficulty: 2,
       type: "beli-barang" as GameType,
-      bgColor: "bg-blue-50"
+      bgColor: "bg-blue-100",
+      active: true
     },
-    { 
-      title: "Kembalian", 
+    {
+      title: "Tukar Uang",
+      description: "Tukar uang besar menjadi pecahan lebih kecil",
+      icon: <Replace className="h-10 w-10 text-orange-500" />,
+      difficulty: 3,
+      type: "tukar-uang" as GameType,
+      bgColor: "bg-orange-100",
+      active: true
+    },
+    {
+      title: "Kembalian Tepat",
       description: "Hitung uang kembalian yang tepat",
-      icon: <RefreshCw className="h-10 w-10 text-purple-500" />, 
-      difficulty: 3, 
+      icon: <RefreshCw className="h-10 w-10 text-rose-500" />,
+      difficulty: 3,
       type: "kembalian" as GameType,
-      bgColor: "bg-purple-50"
+      bgColor: "bg-rose-100",
+      active: true
     },
   ]
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-[#f0fdf4] to-[#ffedd5] p-4 relative">
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] p-4 relative">
       {/* Back Button */}
       <Button
         onClick={() => setCurrentScreen("home")}
@@ -53,39 +66,36 @@ export default function PracticeModeScreen({ setCurrentScreen, startGame }: Prac
       {/* Header */}
       <div className="text-center mb-8 mt-12 max-w-lg">
         <h1 className="text-4xl font-extrabold text-gray-800 mb-3">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-cyan-500">
             Mode Belajar
           </span>
         </h1>
         <p className="text-lg text-gray-600">
-          Pilih mini-game untuk mengasah kemampuan menghitung uang Rupiah!
+          Pelajari cara menghitung uang Rupiah dengan santai!
         </p>
       </div>
 
-      {/* Game Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl px-4 pb-8 justify-center">
+      {/* Game Cards - Softer styling */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl px-4 pb-8">
         {miniGames.map((game) => (
-          <Card 
-            key={game.title}
-            className={`${game.bgColor} hover:shadow-lg transition-all duration-300 border-2 border-gray-100 rounded-xl overflow-hidden group flex flex-col h-full`}
-          >
+          <Card key={game.title}   className={`bg-white ${game.bgColor} hover:shadow-md transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group flex flex-col h-full`}>
             <CardHeader className="flex flex-col items-center p-6 pb-4 space-y-3">
-              <div className="p-3 rounded-full bg-white shadow-md group-hover:scale-110 transition-transform">
+              <div className="p-3 rounded-full bg-white/80 shadow-sm group-hover:scale-105 transition-transform">
                 {game.icon}
               </div>
               <CardTitle className="text-xl font-bold text-gray-800 text-center">
                 {game.title}
               </CardTitle>
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-gray-600 text-center">
                 {game.description}
               </p>
             </CardHeader>
-            <CardFooter className="p-6 pt-0 mt-auto"> {/* Added mt-auto here */}
+            <CardFooter className="p-6 pt-0 mt-auto">
               <Button
-                onClick={() => startGame(game.type)}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all transform hover:scale-[1.02]"
+                onClick={() => startGame(game.type, currentScreen)}
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 rounded-lg shadow-sm transition-all"
               >
-                Mulai Game
+                Mulai Belajar
               </Button>
             </CardFooter>
           </Card>

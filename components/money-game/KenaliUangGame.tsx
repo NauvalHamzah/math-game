@@ -1,5 +1,5 @@
 import { GameLayout } from './GameLayout'
-import { RupiahDenomination } from "@/components/type/MoneyGame"
+import { RupiahDenomination, Screen } from "@/components/type/MoneyGame"
 
 interface KenaliUangGameProps {
     questionCoin: RupiahDenomination
@@ -10,6 +10,7 @@ interface KenaliUangGameProps {
     onAnswer: (value: number) => void
     feedback?: 'correct' | 'wrong' | null
     showCompletion: boolean
+    currentScreen: Screen
 }
 
 const formatRupiah = (amount: number) => {
@@ -28,7 +29,8 @@ export function KenaliUangGame({
     onBack,
     onAnswer,
     feedback,
-    showCompletion
+    showCompletion,
+    currentScreen
 }: KenaliUangGameProps) {
     return (
         <GameLayout

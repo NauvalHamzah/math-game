@@ -252,14 +252,14 @@ export default function HomePage() {
 
       <div className="max-w-6xl mx-auto p-6">
         {/* Filters */}
-        <div className="mb-8 px-4">
+        <div className="mb-8 sm:px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 text-center">
             Pilih Petualanganmu
           </h2>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full items-center">
             {/* Filters container - takes available space */}
-            <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full min-w-0 mr-4">
+            <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full min-w-0 sm:mr-4">
               {/* Category - expanded width */}
               <div className="flex-1 min-w-[200px] sm:min-w-[280px]">
                 <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
@@ -272,7 +272,7 @@ export default function HomePage() {
             </div>
 
             {/* Reset Button - pushed to far right */}
-            <div className="w-full sm:w-auto mt-2 sm:mt-0 ml-10">
+            <div className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-10">
               <Button
                 variant="outline"
                 className="w-full sm:w-auto border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 flex items-center justify-center gap-2 py-2 px-4"
