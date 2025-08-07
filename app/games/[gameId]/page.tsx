@@ -4,47 +4,19 @@ import { Button } from "@/components/ui/button"
 import { useRouter, useParams } from "next/navigation"
 import NumberMatch from "../number-match"
 import MoneyGame from "../money-game"
-
-
-interface GamePageProps {
-  params: {
-    gameId: string
-  }
-}
+import { games } from "@/components/type/General"
+import { Home } from "lucide-react"
 
 export default function GamePage() {
   const router = useRouter()
   const params = useParams()
   const gameId = params.gameId as string
 
+  const matchedGame = games.find(game => game.id === gameId);
+
+
   const handleBackToHome = () => {
     router.push("/")
-  }
-
-  // Game title mapping
-  const getGameTitle = (id: string) => {
-    switch (id) {
-      case "number-match":
-        return "Number Match Challenge"
-      case "fraction-builder":
-        return "Fraction Builder"
-      case "shape-explorer":
-        return "Shape Explorer"
-      case "pattern-detective":
-        return "Pattern Detective"
-      case "equation-balance":
-        return "Equation Balance"
-      case "time-master":
-        return "Time Master"
-      case "money-game":
-        return "Money Game"
-      case "multiplication-race":
-        return "Multiplication Race"
-      case "word-problems":
-        return "Word Problem Solver"
-      default:
-        return "Math Game"
-    }
   }
 
   // Render the appropriate game component
@@ -80,11 +52,15 @@ export default function GamePage() {
           <Button
             onClick={handleBackToHome}
             variant="outline"
-            className="border-2 border-purple-400 text-purple-600 hover:bg-purple-50 bg-transparent"
+            className="border-2 border-purple-400 text-purple-600 hover:bg-purple-50 bg-transparent p-2"
           >
-            ← Back to Games
+            <Home className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold text-gray-800">{getGameTitle(gameId)}</h1>
+
+          <h1 className="text-xl font-bold text-gray-800">
+            {matchedGame?.title}
+          </h1>
+
           <div></div>
         </div>
       </div>

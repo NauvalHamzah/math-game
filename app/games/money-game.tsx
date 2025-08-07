@@ -9,6 +9,8 @@ import { KenaliUangGame } from "@/components/money-game/KenaliUangGame"
 import { BeliBarangGame } from "@/components/money-game/BeliBarangGame"
 import { KembalianGame } from "@/components/money-game/KembalianGame"
 import { TukarUangGame } from "@/components/money-game/TukarUangGame"
+import { KombinasiGame } from "@/components/money-game/KombinasiGame"
+import { se } from "date-fns/locale"
 
 export default function MoneyMatchGame() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home")
@@ -26,7 +28,6 @@ export default function MoneyMatchGame() {
   const [questionCoin, setQuestionCoin] = useState<RupiahDenomination>(rupiahDenominations[0])
   const [coinOptions, setCoinOptions] = useState<number[]>([])
   const [previousQuestion, setPreviousQuestion] = useState<RupiahDenomination>(rupiahDenominations[0]);
-
 
   // Beli Barang state
   const [currentItem, setCurrentItem] = useState<Item>(items[0])
@@ -73,21 +74,21 @@ export default function MoneyMatchGame() {
   };
 
   function getRandomPrice(min: number, max: number): number {
-  // Generate random number between min and max, then round to nearest 100
-  const randomPrice = Math.floor(Math.random() * (max - min + 1)) + min;
-  return Math.round(randomPrice / 100) * 100;
-}
+    // Generate random number between min and max, then round to nearest 100
+    const randomPrice = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.round(randomPrice / 100) * 100;
+  }
 
-  const resetGame = () => {
+  const resetGame = (currentGame: GameType) => {
     setFeedback(null);
 
     try {
-      if (currentGame === "kenali-uang") {
+      if (currentGame === "kenali-uang" || currentGame === "kombinasi") {
         const randomCoin = getRandomQuestion();
         setQuestionCoin(randomCoin);
         setCoinOptions(generateCoinOptions(randomCoin));
-      } 
-      else if (currentGame === "beli-barang") {
+      }
+      if (currentGame === "beli-barang" || currentGame === "kombinasi") {
         if (items.length === 0) throw new Error('No items available');
         const randomItem = items[Math.floor(Math.random() * items.length)];
 
@@ -100,23 +101,23 @@ export default function MoneyMatchGame() {
         setCurrentItem(itemWithRandomPrice);
         setSelectedCoins([]);
       }
-      else if (currentGame === "tukar-uang") {
+      if (currentGame === "tukar-uang" || currentGame === "kombinasi") {
         // Get random denomination to exchange (minimum Rp1000)
         const availableDenominations = rupiahDenominations.filter(
-          coin => coin.value >= 1000 && 
-                (!previousQuestion || coin.value !== previousQuestion.value)
+          coin => coin.value >= 1000 &&
+            (!previousQuestion || coin.value !== previousQuestion.value)
         );
-        
+
         const randomCoin = availableDenominations[
           Math.floor(Math.random() * availableDenominations.length)
         ];
-        
+
         setPreviousQuestion(randomCoin);
         setTargetAmount(randomCoin.value);
         setTargetImage(randomCoin.image);
         setSelectedCoins([]);
       }
-      else if (currentGame === "kembalian") {
+      if (currentGame === "kembalian" || currentGame === "kombinasi") {
         if (items.length === 0) throw new Error('No items available');
         const randomItem = items[Math.floor(Math.random() * items.length)];
 
@@ -132,7 +133,7 @@ export default function MoneyMatchGame() {
         // Ensure payment is always more than price
         const payment = price + Math.max(
           1000,
-          Math.round(Math.random() * 20000/100)*100
+          Math.round(Math.random() * 20000 / 100) * 100
         );
 
         setItemPrice(price);
@@ -148,40 +149,56 @@ export default function MoneyMatchGame() {
     }
   };
 
-  const handleCorrectAnswer = () => {
+  const handleCorrectAnswer = (gameType: GameType) => {
     setFeedback("correct");
     setTimeout(() => {
-      if (currentQuestion < totalQuestions) {
+      if (currentQuestion <= totalQuestions) {
         setCurrentQuestion(currentQuestion + 1);
-        resetGame();
+        resetGame(gameType);
       } else {
         setShowCompletion(true);
         setTimeout(() => {
           setCurrentQuestion(1);
-          setCurrentScreen("practice");
+          currentScreen === "practice-game" ? setCurrentScreen("practice-game") : setCurrentScreen("challenge-game")
           setShowCompletion(false);
         }, 3000);
       }
     }, 1500);
   };
 
-  const handleWrongAnswer = () => {
-    setFeedback("wrong")
-    setTimeout(() => {
-      setFeedback(null)
-      // Reset selections based on game type
-      if (currentGame === "beli-barang") setSelectedCoins([])
-      if (currentGame === "tukar-uang") setSelectedCoins([])
-      if (currentGame === "kembalian") setSelectedChange([])
-    }, 1500)
+  const handleWrongAnswer = (gameType: GameType) => {
+    if (currentScreen === "practice-game") {
+      setFeedback("wrong")
+      setTimeout(() => {
+        setFeedback(null)
+        // Reset selections based on game type
+        if (currentGame === "beli-barang") setSelectedCoins([])
+        if (currentGame === "tukar-uang") setSelectedCoins([])
+        if (currentGame === "kembalian") setSelectedChange([])
+      }, 1500)
+    } else if (currentScreen === "challenge-game") {
+      setTimeout(() => {
+        if (currentQuestion <= totalQuestions) {
+          setCurrentQuestion(currentQuestion + 1);
+          resetGame(gameType);
+        } else {
+          setShowCompletion(true);
+          setTimeout(() => {
+            setCurrentQuestion(1);
+            setCurrentScreen("challenge");
+            setShowCompletion(false);
+          }, 3000);
+        }
+      }, 1500);
+    }
   }
 
-  const handleCoinClick = (value: number) => {
-    if (currentGame === "beli-barang") {
+  const handleCoinClick = (gameType: GameType, value: number) => {
+    if (gameType === "beli-barang") {
       setSelectedCoins(prev => [...prev, value]); // Always add, no toggle
-    } else if (currentGame === "tukar-uang") {
+    } else if (gameType === "tukar-uang") {
       setSelectedCoins(prev => [...prev, value]); // Always add, no toggle
-    } else if (currentGame === "kembalian") {
+    } else if (gameType === "kembalian") {
       setSelectedChange(prev => [...prev, value]); // Always add, no toggle
     }
   }
@@ -214,49 +231,56 @@ export default function MoneyMatchGame() {
 
   };
 
-  const handleCheck = () => {
-    if (currentGame === "beli-barang") {
-      const currentTotal = selectedCoins.reduce((sum, val) => sum + val, 0)
-      if (currentTotal === currentItem.price) {
-        handleCorrectAnswer()
-      } else {
-        handleWrongAnswer()
+  const handleCheck = (gameType: GameType, answer?: number) => {
+    switch (gameType) {
+      case ("kenali-uang"): {
+        if (answer === questionCoin.value) {
+          handleCorrectAnswer(gameType)
+        } else {
+          handleWrongAnswer(gameType)
+        }
+        break;
       }
-    } else if (currentGame === "tukar-uang") {
-    const currentTotal = selectedCoins.reduce((sum, val) => sum + val, 0);
-    if (currentTotal === targetAmount) {
-      handleCorrectAnswer();
-    } else {
-      handleWrongAnswer();
-    }
-    } else if (currentGame === "kembalian") {
-      const currentTotal = selectedChange.reduce((sum, val) => sum + val, 0)
-      if (currentTotal === changeNeeded) {
-        handleCorrectAnswer()
-      } else {
-        handleWrongAnswer()
+      case ("beli-barang"): {
+        const currentTotal = selectedCoins.reduce((sum, val) => sum + val, 0)
+        if (currentTotal === currentItem.price) {
+          handleCorrectAnswer(gameType)
+        } else {
+          handleWrongAnswer(gameType)
+        }
+        break;
+      }
+      case ("tukar-uang"): {
+        const currentTotal = selectedCoins.reduce((sum, val) => sum + val, 0);
+        if (currentTotal === targetAmount) {
+          handleCorrectAnswer(gameType);
+        } else {
+          handleWrongAnswer(gameType);
+        }
+        break;
+      }
+      case ("kembalian"): {
+        const currentTotal = selectedChange.reduce((sum, val) => sum + val, 0)
+        if (currentTotal === changeNeeded) {
+          handleCorrectAnswer(gameType)
+        } else {
+          handleWrongAnswer(gameType)
+        }
+        break;
       }
     }
   }
 
-  const handleCoinIdentification = (selectedValue: number) => {
-    if (selectedValue === questionCoin.value) {
-      handleCorrectAnswer()
-    } else {
-      handleWrongAnswer()
-    }
-  }
-
-  const startGame = (gameType: GameType, screen: "practice"|"challenge") => {
+  const startGame = (gameType: GameType, screen: "practice" | "challenge") => {
     setCurrentGame(gameType)
     setCurrentScreen(`${screen}-game`)
     setCurrentQuestion(1)
-    resetGame()
+    resetGame(gameType)
   }
 
   useEffect(() => {
-    if (currentScreen === "practice-game") {
-      resetGame()
+    if (currentScreen === "practice-game" || currentScreen === "challenge-game") {
+      resetGame(currentGame)
     }
   }, [currentGame])
 
@@ -269,7 +293,7 @@ export default function MoneyMatchGame() {
   if (currentScreen === "practice") {
     return (
       <PracticeModeScreen
-        currentScreen={currentScreen}  
+        currentScreen={currentScreen}
         setCurrentScreen={setCurrentScreen}
         startGame={startGame}
       />
@@ -298,10 +322,11 @@ export default function MoneyMatchGame() {
             currentQuestion={currentQuestion}
             totalQuestions={totalQuestions}
             onBack={() => setCurrentScreen("practice")}
-            onAnswer={handleCoinIdentification}
+            onCheck={handleCheck}
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       case "beli-barang":
@@ -320,9 +345,10 @@ export default function MoneyMatchGame() {
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
-       case "tukar-uang":
+      case "tukar-uang":
         return (
           <TukarUangGame
             targetAmount={targetAmount} // You'll need to set this in your resetGame()
@@ -339,6 +365,7 @@ export default function MoneyMatchGame() {
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       case "kembalian":
@@ -354,10 +381,11 @@ export default function MoneyMatchGame() {
             onCoinClick={handleCoinClick}
             onRemoveCoin={handleRemoveCoin}
             onCheck={handleCheck}
-            getCoinCounts={getCoinCounts}            
+            getCoinCounts={getCoinCounts}
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       default:
@@ -376,10 +404,11 @@ export default function MoneyMatchGame() {
             currentQuestion={currentQuestion}
             totalQuestions={totalQuestions}
             onBack={() => setCurrentScreen("challenge")}
-            onAnswer={handleCoinIdentification}
+            onCheck={handleCheck}
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       case "beli-barang":
@@ -398,13 +427,14 @@ export default function MoneyMatchGame() {
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       case "tukar-uang":
         return (
           <TukarUangGame
-            targetAmount={targetAmount} // You'll need to set this in your resetGame()
-            targetImage={targetImage}    // The image of the money to exchange
+            targetAmount={targetAmount}
+            targetImage={targetImage}
             selectedCoins={selectedCoins}
             currentQuestion={currentQuestion}
             totalQuestions={totalQuestions}
@@ -417,6 +447,7 @@ export default function MoneyMatchGame() {
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
           />
         )
       case "kembalian":
@@ -436,6 +467,34 @@ export default function MoneyMatchGame() {
             feedback={feedback}
             showCompletion={showCompletion}
             currentScreen={currentScreen}
+            gameType={currentGame}
+          />
+        )
+      case "kombinasi":
+        return (
+          <KombinasiGame
+            currentQuestion={currentQuestion}
+            totalQuestions={totalQuestions}
+            questionCoin={questionCoin}
+            coinOptions={coinOptions}
+            onBack={() => setCurrentScreen("challenge")}
+            onCheck={handleCheck}
+            feedback={feedback}
+            showCompletion={showCompletion}
+            currentScreen={currentScreen}
+            gameType={currentGame}
+            currentItem={currentItem}
+            selectedCoins={selectedCoins}
+            onResetCoins={handleResetCoins}
+            onCoinClick={handleCoinClick}
+            onRemoveCoin={handleRemoveCoin}
+            getCoinCounts={getCoinCounts}
+            targetAmount={targetAmount}
+            targetImage={targetImage}
+            itemPrice={itemPrice}
+            customerPayment={customerPayment}
+            changeNeeded={changeNeeded}
+            selectedChange={selectedChange}
           />
         )
       default:

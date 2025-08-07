@@ -3,10 +3,10 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
-import TagDisplay from "@/components/number-match/tag-display"
+import TagDisplay from "@/components/tag-display"
 
 
-const categories = ["Semua", "Bilangan", "Geometri", "Logika", "Aljabar", "Integral", "Differensial"]
+const categories = ["Semua", "Bilangan", "Geometri", "Logika", "Aljabar"]
 
 export default function CategoryFilter({
   selected,

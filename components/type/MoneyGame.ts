@@ -5,6 +5,16 @@ export type RupiahDenomination = {
   image: string
   isBill: boolean
 }
+export interface MiniGame {
+  title: string
+  description: string
+  iconName: "coins" | "shoppingCart" | "replace" | "refresh" | "shuffle"
+  difficulty: number
+  type: GameType
+  bgColor: string
+  active: boolean
+  timeLimit?: number
+}
 
 export type Item = {
   name: string
@@ -67,3 +77,97 @@ export const items = [
   { name: "Sepeda Mini", minPrice: 180000, maxPrice: 250000, emoji: "🚲" },
   { name: "Set Alat Lukis Profesional", minPrice: 120000, maxPrice: 200000, emoji: "🎨🖌️" }
 ];
+
+//List of games in practices
+export const practiceGames: MiniGame[] = [
+  {
+    title: "Kenali Uang",
+    description: "Pelajari nilai mata uang Rupiah",
+    iconName: "coins",
+    difficulty: 1,
+    type: "kenali-uang",
+    bgColor: "bg-green-100",
+    active: true
+  },
+  {
+    title: "Beli Barang",
+    description: "Bayar barang dengan uang pas",
+    iconName: "shoppingCart",
+    difficulty: 2,
+    type: "beli-barang",
+    bgColor: "bg-blue-100",
+    active: true
+  },
+  {
+    title: "Tukar Uang",
+    description: "Tukar uang besar menjadi pecahan lebih kecil",
+    iconName: "replace",
+    difficulty: 3,
+    type: "tukar-uang",
+    bgColor: "bg-orange-100",
+    active: true
+  },
+  {
+    title: "Kembalian Tepat",
+    description: "Hitung uang kembalian yang tepat",
+    iconName: "refresh",
+    difficulty: 3,
+    type: "kembalian",
+    bgColor: "bg-rose-100",
+    active: true
+  }
+]
+
+
+export const challengeGames: MiniGame[] = [
+  {
+    title: "Kenali Uang",
+    description: "Uji kecepatan mengenali uang",
+    iconName: "coins",
+    difficulty: 1,
+    type: "kenali-uang",
+    bgColor: "bg-lime-100",
+    active: true,
+    timeLimit: 120
+  },
+  {
+    title: "Beli Barang",
+    description: "Transaksi cepat dengan uang pas",
+    iconName: "shoppingCart",
+    difficulty: 2,
+    type: "beli-barang",
+    bgColor: "bg-blue-100",
+    active: true,
+    timeLimit: 180
+  },
+  {
+    title: "Tukar Uang",
+    description: "Tukar uang besar menjadi pecahan lebih kecil dengan cepat dan tepat",
+    iconName: "replace",
+    difficulty: 3,
+    type: "tukar-uang",
+    bgColor: "bg-emerald-100",
+    active: true,
+    timeLimit: 180
+  },
+  {
+    title: "Kembalian Tepat",
+    description: "Hitung kembalian dengan cepat dan tepat",
+    iconName: "refresh",
+    difficulty: 3,
+    type: "kembalian",
+    bgColor: "bg-rose-100",
+    active: true,
+    timeLimit: 240
+  },
+  {
+    title: "Kombinasi",
+    description: "Gabungan semua jenis permainan uang",
+    iconName: "shuffle",
+    difficulty: 4,
+    type: "kombinasi",
+    bgColor: "bg-fuchsia-100",
+    active: true,
+    timeLimit: 180
+  }
+]

@@ -3,7 +3,7 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
-import TagDisplay from "@/components/number-match/tag-display"
+import TagDisplay from "@/components/tag-display"
 
 const grades = ["Semua", "Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"]
 

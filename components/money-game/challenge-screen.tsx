@@ -2,7 +2,7 @@
 import { ArrowLeft, Coins, ShoppingCart, RefreshCw, Replace, Shuffle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Screen, GameType } from "@/components/type/MoneyGame"
+import { Screen, GameType, challengeGames } from "@/components/type/MoneyGame"
 
 
 interface ChallangeModeScreenProps {
@@ -11,59 +11,26 @@ interface ChallangeModeScreenProps {
     startGame: (gameType: GameType, screen: "practice" | "challenge") => void
 }
 
+function getIcon(name: string) {
+  const iconProps = { className: "h-10 w-10" }
+
+  switch (name) {
+    case "coins":
+      return <Coins {...iconProps} className="text-yellow-500" />
+    case "shoppingCart":
+      return <ShoppingCart {...iconProps} className="text-blue-500" />
+    case "replace":
+      return <Replace {...iconProps} className="text-orange-500" />
+    case "refresh":
+      return <RefreshCw {...iconProps} className="text-rose-500" />
+    case "shuffle":
+      return <Shuffle {...iconProps} className="text-rose-500" />
+    default:
+      return null
+  }
+}
+
 export default function ChallangeModeScreen({ currentScreen, setCurrentScreen, startGame }: ChallangeModeScreenProps) {
-    const challenges = [
-        {
-            title: "Kenali Uang",
-            description: "Uji kecepatan mengenali uang",
-            icon: <Coins className="h-10 w-10 text-lime-600" />,
-            difficulty: 1,
-            type: "kenali-uang" as GameType,
-            bgColor: "bg-lime-100",
-            active: true,
-            timeLimit: 120
-        },
-        {
-            title: "Beli Barang",
-            description: "Transaksi cepat dengan uang pas",
-            icon: <ShoppingCart className="h-10 w-10 text-blue-600" />,
-            difficulty: 2,
-            type: "beli-barang" as GameType,
-            bgColor: "bg-blue-100",
-            active: true,
-            timeLimit: 180
-        },
-        {
-            title: "Tukar Uang",
-            description: "Tukar uang besar menjadi pecahan lebih kecil dengan cepat dan tepat",
-            icon: <Replace className="h-10 w-10 text-emerald-600" />,
-            difficulty: 3,
-            type: "tukar-uang" as GameType,
-            bgColor: "bg-emerald-100",
-            active: true,
-            timeLimit: 180
-        },
-        {
-            title: "Kembalian Tepat",
-            description: "Hitung kembalian dengan cepat dan tepat",
-            icon: <RefreshCw className="h-10 w-10 text-rose-600" />,
-            difficulty: 3,
-            type: "kembalian" as GameType,
-            bgColor: "bg-rose-100",
-            active: true,
-            timeLimit: 240
-        },
-        {
-            title: "Kombinasi",
-            description: "Gabungan semua jenis permainan uang",
-            icon: <Shuffle className="h-10 w-10 text-fuchsia-600" />,
-            difficulty: 4,  // Increased difficulty since it combines all games
-            type: "kombinasi" as GameType,
-            bgColor: "bg-fuchsia-100",
-            active: false,
-            timeLimit: 300
-        }
-    ]
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-[#fff7ed] to-[#ffedd5] p-4 relative">
@@ -91,11 +58,11 @@ export default function ChallangeModeScreen({ currentScreen, setCurrentScreen, s
 
             {/* Game Cards - Bold styling */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl px-4 pb-8">
-                {challenges.map((game) => (
+                {challengeGames.map((game) => (
                     <Card key={game.title} className={`${game.bgColor} hover:shadow-xl transition-all duration-200 border-2 border-gray-200 rounded-xl overflow-hidden group flex flex-col h-full`}>
                         <CardHeader className="flex flex-col items-center p-6 pb-2 space-y-3">
                             <div className="p-3 rounded-full bg-white shadow-md group-hover:scale-110 transition-transform">
-                                {game.icon}
+                                {getIcon(game.iconName)}
                             </div>
                             <CardTitle className="text-xl font-bold text-gray-800 text-center">
                                 {game.title}

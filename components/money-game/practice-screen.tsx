@@ -2,7 +2,7 @@
 import { ArrowLeft, Coins, ShoppingCart, RefreshCw, Replace } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Screen, GameType } from "@/components/type/MoneyGame"
+import { Screen, GameType, practiceGames } from "@/components/type/MoneyGame"
 
 
 interface PracticeModeScreenProps {
@@ -11,46 +11,24 @@ interface PracticeModeScreenProps {
   startGame: (gameType: GameType, screen: "practice" | "challenge") => void
 }
 
-export default function PracticeModeScreen({ currentScreen, setCurrentScreen, startGame }: PracticeModeScreenProps) {
-  const miniGames = [
-    {
-      title: "Kenali Uang",
-      description: "Pelajari nilai mata uang Rupiah",
-      icon: <Coins className="h-10 w-10 text-yellow-500" />,
-      difficulty: 1,
-      type: "kenali-uang" as GameType,
-      bgColor: "bg-green-100",
-      active: true
-    },
-    {
-      title: "Beli Barang",
-      description: "Bayar barang dengan uang pas",
-      icon: <ShoppingCart className="h-10 w-10 text-blue-500" />,
-      difficulty: 2,
-      type: "beli-barang" as GameType,
-      bgColor: "bg-blue-100",
-      active: true
-    },
-    {
-      title: "Tukar Uang",
-      description: "Tukar uang besar menjadi pecahan lebih kecil",
-      icon: <Replace className="h-10 w-10 text-orange-500" />,
-      difficulty: 3,
-      type: "tukar-uang" as GameType,
-      bgColor: "bg-orange-100",
-      active: true
-    },
-    {
-      title: "Kembalian Tepat",
-      description: "Hitung uang kembalian yang tepat",
-      icon: <RefreshCw className="h-10 w-10 text-rose-500" />,
-      difficulty: 3,
-      type: "kembalian" as GameType,
-      bgColor: "bg-rose-100",
-      active: true
-    },
-  ]
+function getIcon(name: string) {
+  const iconProps = { className: "h-10 w-10" }
 
+  switch (name) {
+    case "coins":
+      return <Coins {...iconProps} className="text-yellow-500" />
+    case "shoppingCart":
+      return <ShoppingCart {...iconProps} className="text-blue-500" />
+    case "replace":
+      return <Replace {...iconProps} className="text-orange-500" />
+    case "refresh":
+      return <RefreshCw {...iconProps} className="text-rose-500" />
+    default:
+      return null
+  }
+}
+
+export default function PracticeModeScreen({ currentScreen, setCurrentScreen, startGame }: PracticeModeScreenProps) {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] p-4 relative">
       {/* Back Button */}
@@ -77,11 +55,11 @@ export default function PracticeModeScreen({ currentScreen, setCurrentScreen, st
 
       {/* Game Cards - Softer styling */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl px-4 pb-8">
-        {miniGames.map((game) => (
+        {practiceGames.map((game) => (
           <Card key={game.title}   className={`bg-white ${game.bgColor} hover:shadow-md transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group flex flex-col h-full`}>
             <CardHeader className="flex flex-col items-center p-6 pb-4 space-y-3">
               <div className="p-3 rounded-full bg-white/80 shadow-sm group-hover:scale-105 transition-transform">
-                {game.icon}
+                {getIcon(game.iconName)}
               </div>
               <CardTitle className="text-xl font-bold text-gray-800 text-center">
                 {game.title}
